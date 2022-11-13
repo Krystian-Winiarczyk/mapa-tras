@@ -1,0 +1,101 @@
+$sizes: (
+        25: 0.25rem,
+        50: 0.5rem,
+        75: 0.75rem,
+        1: 1rem,
+        2: 2rem,
+        3: 3rem,
+        4: 4rem,
+        5: 5rem
+);
+$directions: (
+        "t": "top",
+        "r": "right",
+        "b": "bottom",
+        "l": "left"
+);
+$spacers: (
+        "p": "padding",
+        "m": "margin"
+);
+
+// Margins, Paddings
+@each $size, $size-value in $sizes {
+  @each $spacer, $spacer-value in $spacers {
+    .#{$spacer}-#{$size} {
+      #{$spacer-value}: #{$size-value};
+    }
+
+    @each $direction, $direction-value in $directions {
+      .#{$spacer}#{$direction}-#{$size} {
+        #{$spacer-value}-#{$direction-value}: #{$size-value};
+      }
+    }
+  }
+}
+
+// Displays
+$displays: "block", "inline-block", "flex", "grid";
+@each $display in $displays {
+  .d-#{$display} {
+    display: #{$display};
+  }
+}
+
+$display-positions: "end", "start", "space-between", "center";
+$display-objects: "self", "content", "items";
+$display-keys: "align", "justify";
+
+@each $display-key in $display-keys {
+  @each $display-position in $display-positions {
+    @each $display-object in $display-objects {
+
+      .#{$display-key}-#{$display-object}-#{$display-position} {
+        #{$display-key}-#{$display-object}: #{$display-position};
+      }
+    }
+  }
+}
+
+$text-aligns: "center", "right", "left";
+@each $text-align in $text-aligns {
+  .text-#{$text-align} {
+    text-align: #{$text-align};
+  }
+}
+
+// System colors
+$colors: "primary", "success", "warning", "secondary", "danger", "info";
+$colorVariants: "light-3", "light-5", "light-7", "light-8", "light-9", "dark-2";
+
+@each $color in $colors {
+  .bg-#{$color} {
+    background-color: var(--el-color-#{$color});
+  }
+
+  @each $colorVariant in $colorVariants {
+    .bg-#{$color}-#{$colorVariant} {
+      background-color: var(--el-color-#{$color}-#{$colorVariant});
+    }
+  }
+}
+
+// System - Table
+.el-table {
+  overflow: visible !important;
+  border-radius: 5px;
+  .el-table__header-wrapper {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  .el-table__inner-wrapper {
+    box-shadow: 0 0 10px 0 rgba(34, 41, 47, .1);
+  }
+}
+
+// System - Sidebar
+.el-menu-item.is-active {
+  background-color: var(--el-menu-active-color);
+  color: #fff !important;
+}
