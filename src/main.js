@@ -14,6 +14,8 @@ import "element-plus/dist/index.css"
 
 // Icons
 import * as ElementPlusIcons from "@element-plus/icons-vue"
+
+app.provide('icons', Object.entries(ElementPlusIcons).map(i => i[0]))
 for (const [key, component] of Object.entries(ElementPlusIcons)) {
   app.component(key, component)
 }

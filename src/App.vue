@@ -9,6 +9,7 @@ import Layout from "@/core/layout/Layout"
 import { useDark } from "@vueuse/core"
 import useAuth from "@/composable/useAuth"
 import { provide } from "vue"
+import useSettings from "@/composable/useSettings"
 
 export default {
   components: { Layout },

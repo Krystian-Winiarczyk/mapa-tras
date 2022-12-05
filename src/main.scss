@@ -99,3 +99,7 @@ $colorVariants: "light-3", "light-5", "light-7", "light-8", "light-9", "dark-2";
   background-color: var(--el-menu-active-color);
   color: #fff !important;
 }
+
+.el-drawer__header {
+  margin-bottom: 12px !important;
+}

@@ -1,77 +1,74 @@
-import { computed, reactive, ref } from "vue"
+import { computed, ref } from "vue"
 import useNotification from "@/composable/useNotification"
+import { store } from '@/libs/firebase'
+import { addDoc, setDoc, collection, doc, GeoPoint, onSnapshot } from 'firebase/firestore'
+import useAuth from "@/composable/useAuth"
+import { getGeoPoints } from "@/utils"
 
-const places = reactive([
-  {
-    id: 1,
-    name: 'Trzęsacz',
-    geolocation: [54.075901, 14.992305],
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque est explicabo iure laborum necessitatibus nulla perferendis praesentium provident quod, sapiente unde ut voluptatum? A dignissimos eius maxime pariatur velit? Doloribus?',
-    visited: false,
-    favourite: false,
-    images: [
-      'https://ocdn.eu/pulscms-transforms/1/m3Fk9kpTURBXy82OGI1ZWEzMjYwY2Y3OGI3NmY2NDI2MGU3ZDAyY2JmNS5qcGeSlQLNA8AAwsOVAgDNA8DCw94AAaEwBQ'
-    ]
-  },
-  {
-    id: 2,
-    name: 'Pojezierze Drawskie',
-    geolocation: [53.5740035,16.1422275],
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque est explicabo iure laborum necessitatibus nulla perferendis praesentium provident quod, sapiente unde ut voluptatum? A dignissimos eius maxime pariatur velit? Doloribus?',
-    visited: true,
-    favourite: false,
-    images: [
-      'https://ocdn.eu/pulscms-transforms/1/eDXk9kqTURBXy81Mzk5YmVmNGY2NjQ5NjQ1YjJkM2YzNWU3ZTE1MjkzZS5qcGVnkpUCzQPAAMLDlQIAzQPAwsPeAAGhMAU'
-    ]
-  },
-  {
-    id: 3,
-    name: 'Jura Krakowsko-Częstochowska',
-    geolocation: [50.2065614,19.8289439],
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque est explicabo iure laborum necessitatibus nulla perferendis praesentium provident quod, sapiente unde ut voluptatum? A dignissimos eius maxime pariatur velit? Doloribus?',
-    visited: true,
-    favourite: true,
-    images: [
-      'https://ocdn.eu/pulscms-transforms/1/WMPk9kpTURBXy9kZjMxZmE2NzYwZGZkYjY1YTIwZTE2MjdiY2E4YTBkYy5qcGeSlQLNA8AAwsOVAgDNA8DCw94AAaEwBQ'
-    ]
-  }
-])
+const places = ref([])
 
 const editedPlace = ref(null)
 
-export default function useMapPlaces() {
+export default function useMapPlaces(init = false) {
+  const { currentUser } = useAuth()
   const { success, error } = useNotification()
 
-  const changeFavourite = (placeId, value) => {
-    const placeIndex = places.findIndex(({ id }) => id === placeId)
-    if (placeIndex < 0) error('Coś poszło nie tak!')
-
-    places[placeIndex].favourite = !value
-    success('Pomyślnie zaaktualizowano wartość!')
-  }
-
-  const changeVisited = (placeId, value) => {
-    const placeIndex = places.findIndex(({ id }) => id === placeId)
-    if (placeIndex < 0) error('Coś poszło nie tak!')
-
-    places[placeIndex].visited = !value
-    success('Pomyślnie zaaktualizowano wartość!')
-  }
+  const items = computed(() => places.value)
 
   // Edit / Create place
   const isPlaceEdited = computed(() => Boolean(editedPlace.value))
-  const save = () => {
 
+  const updatePlace = async (payload = editedPlace.value) => {
+    const uid = currentUser.value.uid
+    const id = payload?.id
+    const collectionRef = collection(store, 'users', uid, 'trips')
+
+    const item = { ...payload }
+    const points = getGeoPoints(item.geolocation)
+    if (!points) return
+
+    item.geolocation = new GeoPoint(points[0], points[1])
+
+    try {
+      if (Boolean(id)) {
+        delete item.id
+        const docRef = doc(store, 'users', uid, 'trips', id)
+        await setDoc(docRef, item)
+        success('Pomyślnie zaaktualizowano!')
+      } else {
+        const newDocRef = await addDoc(collectionRef, item)
+        success('Pomyślnie dodano!')
+      }
+    } catch (err) {
+      error(err?.message || 'Coś poszło nie tak!!')
+    } finally {
+      editedPlace.value = null
+    }
   }
 
+  const getData = async () => {
+    const collectionRef = collection(store, 'users', currentUser.value.uid, 'trips')
+
+    const unsub = onSnapshot(collectionRef, docsSnap => {
+      if (!docsSnap.empty) {
+        places.value = docsSnap.docs.map(doc => {
+          const data = doc.data()
+          return { id: doc.id, ...data, geolocation: [data.geolocation?.latitude, data.geolocation?.longitude] }
+        })
+      } else {
+        places.value = []
+      }
+    })
+  }
+
+  init && getData()
+
   return {
-    places,
+    items,
 
     editedPlace,
     isPlaceEdited,
-    save,
 
-    changeFavourite,
-    changeVisited
+    updatePlace
   }
 }

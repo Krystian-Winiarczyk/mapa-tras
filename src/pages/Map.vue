@@ -13,51 +13,97 @@
       </card-glass>
     </el-collapse-transition>
 
+    <place-edit-modal />
+    <settings-modal />
+
     <l-map
       :zoom="zoom"
       :center="currentPoint"
       max-zoom="18"
       min-zoom="2"
+      @update:center="updateCenterPoint"
     >
       <l-tile-layer
         :url="mapUrl"
       />
 
+      <!--   Center Point Marker   -->
       <l-marker
-        v-for="place in places"
+        :lat-lng="currentPoint"
+      >
+        <l-icon>
+          <div
+            class="custom-pin home-pin"
+            :style="{ '--color': 'white' }"
+          >
+            <el-icon size="17">
+              <home-filled />
+            </el-icon>
+          </div>
+        </l-icon>
+      </l-marker>
+
+      <l-marker
+        v-for="place in items"
         :key="`marker_${place.id}`"
         :lat-lng="place.geolocation"
-      />
+      >
+        <l-icon>
+          <div
+            class="custom-pin home-pin"
+            :style="{ '--color': place.visited ? '#67C23A' : '#F56C6C' }"
+          >
+            <el-icon size="17">
+              <component :is="place.visited ? 'success-filled' : 'circle-close-filled'" />
+            </el-icon>
+          </div>
+        </l-icon>
+      </l-marker>
     </l-map>
   </div>
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet"
+import { LMap, LTileLayer, LMarker, LIcon } from "@vue-leaflet/vue-leaflet"
 import CardGlass from "@/core/components/cards/CardGlass"
 import useMap from "@/composable/useMap"
 import useMapPlaces from "@/composable/useMapPlaces"
-import useSidebar from "@/composable/useSidebar"
+import useSettings from "@/composable/useSettings"
 import PlaceList from "@/views/map/PlaceList"
+import PlaceEditModal from "@/views/map/PlaceEditModal"
+import SettingsModal from "@/views/map/settings/SettingsModal"
 
 export default {
-  // eslint-disable-next-line vue/no-reserved-component-names
+  /* eslint-disable */
   name: "Map",
   components: {
+    SettingsModal,
+    PlaceEditModal,
     PlaceList,
     CardGlass,
     LMap,
     LTileLayer,
-    LMarker
+    LMarker,
+    LIcon
   },
+
   setup() {
-    const { places } = useMapPlaces()
-    const { showPlaces } = useSidebar()
+    const { currentPoint, zoom } = useMap(true)
+    const { items } = useMapPlaces()
+    const { showPlaces } = useSettings()
+
+    const updateCenterPoint = event => {
+      currentPoint.value = [event?.lat, event?.lng]
+    }
 
     return {
       ...useMap(),
-      places,
-      showPlaces
+      items,
+      showPlaces,
+      currentPoint,
+      zoom,
+
+      updateCenterPoint
     }
   },
   data () {
@@ -67,3 +113,36 @@ export default {
   }
 }
 </script>
+
+
+<style lang="scss">
+.custom-pin {
+    position: relative;
+    border-radius: 50% 50% 50% 0;
+    border: 2px solid var(--color);
+    width: 24px;
+    height: 24px;
+    transform: rotate(-45deg) translate(16px, -35px);
+
+    &.home-pin {
+      & i {
+        position: absolute;
+        transform: translate(-50%, -50%) rotate(45deg);
+        top: 50%;
+        left: 50%;
+      }
+    }
+
+    &:not(.home-pin)::after {
+      position: absolute;
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--color);
+    }
+  }
+</style>

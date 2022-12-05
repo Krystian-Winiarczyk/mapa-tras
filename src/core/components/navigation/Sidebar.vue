@@ -21,6 +21,25 @@
         </template>
       </el-menu-item>
 
+      <!-- Add Places Card -->
+      <el-menu-item @click="editedPlace = true">
+        <el-icon>
+          <plus />
+        </el-icon>
+        <template #title>
+          Places
+        </template>
+      </el-menu-item>
+
+      <el-menu-item @click="settingsModal = true">
+        <el-icon>
+          <setting />
+        </el-icon>
+        <template #title>
+          Settings
+        </template>
+      </el-menu-item>
+
       <el-menu-item
         v-for="(navMenuItem, index) in routes"
         :key="`router_link_${index}`"
@@ -38,15 +57,19 @@
 
 <script>
 import navMenuItems from "@/core/components/navigation/navMenuItems"
-import useSidebar from "@/composable/useSidebar"
+import useSettings from "@/composable/useSettings"
+import useMapPlaces from "@/composable/useMapPlaces"
 
 export default {
   name: "SidebarCompo",
   setup() {
-    const { showPlaces } = useSidebar()
+    const { showPlaces, settingsModal } = useSettings()
+    const { editedPlace } = useMapPlaces()
 
     return {
-      showPlaces
+      showPlaces,
+      editedPlace,
+      settingsModal
     }
   },
   data: () => ({

@@ -2,7 +2,7 @@
   <div style="height: calc(95vh - 20px)">
     <el-scrollbar height="100%">
       <el-card
-        v-for="place in places"
+        v-for="place in items"
         :key="place.id"
         style="margin: 10px 0"
         :body-style="{ padding: '0px' }"
@@ -20,7 +20,7 @@
                 type="success"
                 circle
                 size="large"
-                @click="changeFavourite(place.id, place.favourite)"
+                @click="updatePlace({ ...place, favourite: !place.favourite })"
               >
                 <el-icon size="18">
                   <component :is="place.favourite ? 'star-filled' : 'star'" />
@@ -37,7 +37,7 @@
                 type="primary"
                 circle
                 size="large"
-                @click="changeVisited(place.id, place.visited)"
+                @click="updatePlace({ ...place, visited: !place.visited })"
               >
                 <el-icon size="18">
                   <component :is="place.visited ? 'check' : 'close'" />
@@ -50,6 +50,9 @@
         <template #header>
           <div class="card-header">
             <span>{{ place.name }}</span>
+            <el-icon @click="editedPlace = place">
+              <edit />
+            </el-icon>
           </div>
         </template>
 
@@ -63,20 +66,16 @@
 
 <script>
 import useMapPlaces from "@/composable/useMapPlaces"
-import useAuth from "@/composable/useAuth"
 
 export default {
   name: "PlaceList",
   setup() {
-    const { places, changeFavourite, changeVisited } = useMapPlaces()
-
-    const { currentUser } = useAuth()
-    console.log(currentUser.value)
+    const { editedPlace, items, updatePlace } = useMapPlaces()
 
     return {
-      places,
-      changeVisited,
-      changeFavourite
+      editedPlace,
+      items,
+      updatePlace
     }
   }
 }
