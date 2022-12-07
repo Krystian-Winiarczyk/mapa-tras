@@ -52,10 +52,8 @@ export default function useMapPlaces(init = false) {
     console.log('filter', filter)
 
     const collectionRef = collection(store, 'users', currentUser.value.uid, 'trips')
-    const filters = [
-      where('visited', '!=', false)
-      // where('favourite', '==', true)
-    ]
+    const filters = []
+
     if (filter?.group) filters.push(where('group.name', '==', filter.group.name))
     if (filter?.isVisited) filters.push(where('visited', '==', true))
     if (filter?.isNotVisited) filters.push(where('visited', '==', false))
