@@ -33,9 +33,10 @@
   const itemData = ref({})
 
   watch(editedPlace, newValue => {
-    console.log(getCurrentPoint)
-    if (newValue === true) Object.assign(itemData.value, { ...defaultPlace, geolocation: getCurrentPoint })
-    else Object.assign(itemData.value, { ...newValue })
+    if (newValue === true) Object.assign(itemData.value, { ...defaultPlace, geolocation: getCurrentPoint.value })
+    else if (newValue) Object.assign(itemData.value, { ...newValue, images: newValue.images.map(image => ({ url: image })) })
+
+    console.log()
   })
 
   const checkPlace = () => {
@@ -89,19 +90,32 @@
           label="Group"
           prop="group"
         >
-          <el-select
-            v-model="itemData.group"
-            filterable
-          >
-            <el-option
-              v-for="group in groups"
-              :key="group.id"
-              :label="group.name"
-              :value="group"
+          <div style="width: 100%; display: flex">
+            <div style="margin-right: 5px">
+              <el-button disabled>
+                <el-icon
+                  v-if="itemData.group"
+                  size="18"
+                >
+                  <component :is="itemData.group.icon" />
+                </el-icon>
+              </el-button>
+            </div>
+            <el-select
+              v-model="itemData.group"
+              filterable
+              style="width: 100%"
             >
-              <el-icon><component :is="group.icon" /></el-icon> {{ group.name }}
-            </el-option>
-          </el-select>
+              <el-option
+                v-for="group in groups"
+                :key="group.id"
+                :label="group.name"
+                :value="group"
+              >
+                <el-icon><component :is="group.icon" /></el-icon> {{ group.name }}
+              </el-option>
+            </el-select>
+          </div>
         </el-form-item>
         <el-form-item
           label="Geolocation"
@@ -136,7 +150,10 @@
           </el-row>
         </el-form-item>
 
-        <drag-drop-uploader ref="uploader" />
+        <drag-drop-uploader
+          ref="uploader"
+          :default-values="itemData.images"
+        />
       </el-form>
     </template>
     <template #footer>

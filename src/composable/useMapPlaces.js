@@ -1,7 +1,7 @@
 import { computed, ref } from "vue"
 import useNotification from "@/composable/useNotification"
 import { store } from '@/libs/firebase'
-import { addDoc, setDoc, collection, doc, GeoPoint, onSnapshot } from 'firebase/firestore'
+import { addDoc, setDoc, collection, doc, GeoPoint, onSnapshot, query, where } from 'firebase/firestore'
 import useAuth from "@/composable/useAuth"
 import { getGeoPoints } from "@/utils"
 
@@ -10,6 +10,7 @@ const places = ref([])
 const editedPlace = ref(null)
 
 export default function useMapPlaces(init = false) {
+  let subscriber = null
   const { currentUser } = useAuth()
   const { success, error } = useNotification()
 
@@ -46,10 +47,24 @@ export default function useMapPlaces(init = false) {
     }
   }
 
-  const getData = async () => {
-    const collectionRef = collection(store, 'users', currentUser.value.uid, 'trips')
+  const getData = async filter => {
+    if (subscriber) subscriber()
+    console.log('filter', filter)
 
-    const unsub = onSnapshot(collectionRef, docsSnap => {
+    const collectionRef = collection(store, 'users', currentUser.value.uid, 'trips')
+    const filters = [
+      where('visited', '!=', false)
+      // where('favourite', '==', true)
+    ]
+    if (filter?.group) filters.push(where('group.name', '==', filter.group.name))
+    if (filter?.isVisited) filters.push(where('visited', '==', true))
+    if (filter?.isNotVisited) filters.push(where('visited', '==', false))
+    if (filter?.isFavourite) filters.push(where('favourite', '==', true))
+    if (filter?.isNotFavourite) filters.push(where('favourite', '==', false))
+
+    const builder = query(collectionRef, ...filters)
+
+    subscriber = onSnapshot(builder, docsSnap => {
       if (!docsSnap.empty) {
         places.value = docsSnap.docs.map(doc => {
           const data = doc.data()
@@ -59,6 +74,7 @@ export default function useMapPlaces(init = false) {
         places.value = []
       }
     })
+
   }
 
   init && getData()
@@ -69,6 +85,7 @@ export default function useMapPlaces(init = false) {
     editedPlace,
     isPlaceEdited,
 
-    updatePlace
+    updatePlace,
+    getData
   }
 }

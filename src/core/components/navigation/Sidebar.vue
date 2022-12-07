@@ -1,6 +1,9 @@
 <template>
   <el-scrollbar class="vertical-menu">
-    <el-menu collapse>
+    <el-menu
+      collapse
+      class="mr-50 ml-25"
+    >
       <div>
         <div class="text-center pt-50 pl-25 pr-25">
           <el-image
@@ -11,46 +14,47 @@
         </div>
       </div>
 
-      <!-- Collapse Places Card -->
-      <el-menu-item @click="showPlaces = !showPlaces">
-        <el-icon>
-          <star />
-        </el-icon>
-        <template #title>
-          Places
-        </template>
-      </el-menu-item>
+      <el-menu-item-group class="map-filters">
+        <!-- Collapse Places Card -->
+        <el-menu-item @click="showPlaces = !showPlaces">
+          <el-icon>
+            <location />
+          </el-icon>
+          <template #title>
+            Places
+          </template>
+        </el-menu-item>
+      </el-menu-item-group>
 
-      <!-- Add Places Card -->
-      <el-menu-item @click="editedPlace = true">
-        <el-icon>
-          <plus />
-        </el-icon>
-        <template #title>
-          Places
-        </template>
-      </el-menu-item>
-
-      <el-menu-item @click="settingsModal = true">
-        <el-icon>
-          <setting />
-        </el-icon>
-        <template #title>
-          Settings
-        </template>
-      </el-menu-item>
-
-      <el-menu-item
-        v-for="(navMenuItem, index) in routes"
-        :key="`router_link_${index}`"
+      <el-menu-item-group
+        style="position: absolute; bottom: 0"
       >
-        <el-icon>
-          <component :is="navMenuItem.icon" />
-        </el-icon>
-        <template #title>
-          {{ navMenuItem.title }}
-        </template>
-      </el-menu-item>
+        <!-- Add Places Card -->
+        <el-menu-item @click="editedPlace = true">
+          <el-icon><plus /></el-icon>
+          <template #title>
+            New place
+          </template>
+        </el-menu-item>
+        <el-menu-item @click="settingsModal = true">
+          <el-icon><setting /></el-icon>
+          <template #title>
+            Settings
+          </template>
+        </el-menu-item>
+      </el-menu-item-group>
+
+      <!--      <el-menu-item-->
+      <!--        v-for="(navMenuItem, index) in routes"-->
+      <!--        :key="`router_link_${index}`"-->
+      <!--      >-->
+      <!--        <el-icon>-->
+      <!--          <component :is="navMenuItem.icon" />-->
+      <!--        </el-icon>-->
+      <!--        <template #title>-->
+      <!--          {{ navMenuItem.title }}-->
+      <!--        </template>-->
+      <!--      </el-menu-item>-->
     </el-menu>
   </el-scrollbar>
 </template>
@@ -78,8 +82,12 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
   .vertical-menu .el-menu {
     height: 100vh !important;
+  }
+
+  .vertical-menu .el-menu .el-badge__content.is-fixed {
+    top: 5px !important;
   }
 </style>

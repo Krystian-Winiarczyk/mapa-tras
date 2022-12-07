@@ -11,6 +11,7 @@ import "leaflet/dist/leaflet.css"
 import ElementPlus from "element-plus"
 import 'element-plus/theme-chalk/dark/css-vars.css'
 import "element-plus/dist/index.css"
+import "./main.scss"
 
 // Icons
 import * as ElementPlusIcons from "@element-plus/icons-vue"

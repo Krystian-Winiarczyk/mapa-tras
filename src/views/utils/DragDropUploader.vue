@@ -28,14 +28,24 @@
 </template>
 
 <script setup>
-import { ref, defineExpose } from 'vue'
+import { ref, defineExpose, watch } from "vue"
 import { uploadBytesResumable, getDownloadURL, ref as storageRef } from 'firebase/storage'
 import { storage } from '@/libs/firebase'
 
-const fileList = ref([])
-
+const fileList = ref(props.defaultValues)
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
+
+const props = defineProps({
+  defaultValues: {
+    type: Array,
+    default: () => []
+  }
+})
+
+watch(props.defaultValues, newValue => {
+  fileList.value = newValue
+})
 
 const uploadFile = file => new Promise((resolve, reject) => {
   const uploaderRef = storageRef(storage, `trips/${Date.now()}_${file.name}`)
@@ -55,10 +65,12 @@ const uploadFile = file => new Promise((resolve, reject) => {
 })
 
 const uploadFiles = async () => {
-  const newFiles = fileList.value.map((file, index) => ({ ...file, index })).filter(file => file?.raw)
+  const newFiles = fileList.value.map((file, index) => ({ ...file, index })).filter(file => file?.raw) || []
+  const existedFiles = fileList.value.filter(file => !file?.raw).map(file => file.url) || []
+
   const urls = await Promise.all(newFiles.map(file => uploadFile(file)))
 
-  return urls
+  return [...urls, ...existedFiles]
 }
 
 const handleRemove = (uploadFile, uploadFiles) => {

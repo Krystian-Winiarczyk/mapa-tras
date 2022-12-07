@@ -1,3 +1,7 @@
+//@tailwind base;
+//@tailwind components;
+//@tailwind utilities;
+
 $sizes: (
         25: 0.25rem,
         50: 0.5rem,
@@ -81,25 +85,25 @@ $colorVariants: "light-3", "light-5", "light-7", "light-8", "light-9", "dark-2";
 }
 
 // System - Table
-.el-table {
-  overflow: visible !important;
-  border-radius: 5px;
-  .el-table__header-wrapper {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-  }
-
-  .el-table__inner-wrapper {
-    box-shadow: 0 0 10px 0 rgba(34, 41, 47, .1);
-  }
-}
-
-// System - Sidebar
-.el-menu-item.is-active {
-  background-color: var(--el-menu-active-color);
-  color: #fff !important;
-}
-
-.el-drawer__header {
-  margin-bottom: 12px !important;
-}
+//.el-table {
+//  overflow: visible !important;
+//  border-radius: 5px;
+//  .el-table__header-wrapper {
+//    border-top-left-radius: 5px;
+//    border-top-right-radius: 5px;
+//  }
+//
+//  .el-table__inner-wrapper {
+//    box-shadow: 0 0 10px 0 rgba(34, 41, 47, .1);
+//  }
+//}
+//
+//// System - Sidebar
+//.el-menu-item.is-active {
+//  background-color: var(--el-menu-active-color);
+//  color: #fff !important;
+//}
+//
+//.el-drawer__header {
+//  margin-bottom: 12px !important;
+//}

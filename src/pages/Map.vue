@@ -1,7 +1,5 @@
 <template>
-  <div
-    style="position: relative; height: 100vh"
-  >
+  <div style="position: relative; height: 100vh">
     <el-collapse-transition>
       <card-glass
         v-show="showPlaces"
@@ -13,8 +11,14 @@
       </card-glass>
     </el-collapse-transition>
 
+    <!-- Place Edit Modal -->
     <place-edit-modal />
+    <!-- Settings Modal -->
     <settings-modal />
+    <!-- Filters -->
+    <teleport to=".map-filters">
+      <place-list-filters />
+    </teleport>
 
     <l-map
       :zoom="zoom"
@@ -54,7 +58,7 @@
             :style="{ '--color': place.visited ? '#67C23A' : '#F56C6C' }"
           >
             <el-icon size="17">
-              <component :is="place.visited ? 'success-filled' : 'circle-close-filled'" />
+              <component :is="place.group.icon" />
             </el-icon>
           </div>
         </l-icon>
@@ -72,11 +76,13 @@ import useSettings from "@/composable/useSettings"
 import PlaceList from "@/views/map/PlaceList"
 import PlaceEditModal from "@/views/map/PlaceEditModal"
 import SettingsModal from "@/views/map/settings/SettingsModal"
+import PlaceListFilters from "@/views/map/PlaceListFilters"
 
 export default {
   /* eslint-disable */
   name: "Map",
   components: {
+    PlaceListFilters,
     SettingsModal,
     PlaceEditModal,
     PlaceList,

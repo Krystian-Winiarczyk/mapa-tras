@@ -1,6 +1,6 @@
 <template>
-  <div style="height: calc(95vh - 20px)">
-    <el-scrollbar height="100%">
+  <div>
+    <el-scrollbar height="94vh">
       <el-card
         v-for="place in items"
         :key="place.id"
@@ -48,7 +48,7 @@
         </div>
 
         <template #header>
-          <div class="card-header">
+          <div class="card-header d-flex justify-content-space-between">
             <span>{{ place.name }}</span>
             <el-icon @click="editedPlace = place">
               <edit />
@@ -66,6 +66,8 @@
 
 <script>
 import useMapPlaces from "@/composable/useMapPlaces"
+import useSettings from "@/composable/useSettings"
+import { reactive } from "vue"
 
 export default {
   name: "PlaceList",
